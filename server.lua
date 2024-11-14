@@ -1,8 +1,7 @@
--- server/version.lua
 local currentVersion = GetResourceMetadata(GetCurrentResourceName(), 'version') or '1.0.0'
 local repositoryOwner = "Linux5real"
 local repositoryName = "L4-notify"
-local checkTimeout = 10000 -- 10 seconds timeout
+local checkTimeout = 10000
 
 local function debugPrint(message, type)
     local prefix = '^3[L4-Notify]^7 '
@@ -81,24 +80,21 @@ function checkVersion()
     )
 end
 
--- Verzögerter Start des Version-Checks
 CreateThread(function()
-    Wait(5000) -- Warte 5 Sekunden nach Serverstart
+    Wait(5000) 
     pcall(function()
         checkVersion()
     end)
 end)
 
--- Export für manuelle Prüfung
 exports('checkVersion', function()
     pcall(function()
         checkVersion()
     end)
 end)
 
--- Konsolen-Kommando
 RegisterCommand('checknotifyversion', function(source, args)
-    if source == 0 then -- Nur Konsole
+    if source == 0 then
         pcall(function()
             checkVersion()
         end)
