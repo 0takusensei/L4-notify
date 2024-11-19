@@ -1,3 +1,13 @@
+-- Choose your framework (Remove -- before the framework you want to use)
+-- QBCore = exports['qb-core']:GetCoreObject()
+ESX = exports['es_extended']:getSharedObject()
+
+-- Standalone (No frameworks)
+-- local admins = {
+--     'steam:110000112345678', -- Example Steam Hex
+--     'steam:110000187654321'  -- Add more admin IDs here
+-- }
+
 local currentVersion = GetResourceMetadata(GetCurrentResourceName(), 'version') or '1.0.0'
 local repositoryOwner = "Linux5real"
 local repositoryName = "L4-notify"
@@ -100,3 +110,94 @@ RegisterCommand('checknotifyversion', function(source, args)
         end)
     end
 end, true)
+
+local function isAdmin(source)
+    local group = nil
+
+    if QBCore then
+        group = QBCore.Functions.GetPermission(source)
+    end
+
+    if ESX then
+        local xPlayer = ESX.GetPlayerFromId(source)
+        if xPlayer then
+            local group = xPlayer.getGroup()
+            return group == 'admin' or group == 'superadmin'
+        end
+    end
+
+    if not group then
+        group = 'user'
+    end
+    return group == 'admin'
+end
+
+RegisterCommand('notify', function(source, args, rawCommand)
+    local adminStatus = isAdmin(source)
+    if not adminStatus then
+        print("^1[ERROR]^7 Access denied for source: " .. tostring(source))
+        TriggerClientEvent('l4-notify:show', source, {
+            type = 'error',
+            message = 'You must be an admin to use this command!',
+            length = 5000
+        })
+        return
+    end
+
+    if #args < 2 then
+        TriggerClientEvent('l4-notify:show', source, {
+            type = 'error', 
+            message = 'Usage: /notify [type] [message] [position] [sound] [iconAnimation]',
+            length = 5000
+        })
+        return
+    end
+
+    local type = args[1]
+    local validTypes = {error = true, success = true, warning = true, info = true, neutral = true}
+    
+    if not validTypes[type] then
+        TriggerClientEvent('l4-notify:show', source, {
+            type = 'error',
+            message = 'Invalid type! Available types: success, error, warning, info, neutral',
+            length = 5000
+        })
+        return
+    end
+
+    table.remove(args, 1)
+    
+    local position = "top-left"
+    local sound = true
+    local iconAnimation = true
+    
+    if #args >= 3 then
+        local validPositions = {
+            ['top'] = true, ['bottom'] = true, 
+            ['top-left'] = true, ['top-right'] = true,
+            ['bottom-left'] = true, ['bottom-right'] = true,
+            ['middle-left'] = true, ['middle-right'] = true
+        }
+        
+        if validPositions[args[#args-2]] then
+            position = args[#args-2]
+            sound = args[#args-1] == "true"
+            iconAnimation = args[#args] == "true"
+            table.remove(args, #args)
+            table.remove(args, #args)
+            table.remove(args, #args)
+        end
+    end
+    
+    local message = table.concat(args, " ")
+    if message == "" then message = "Test Message" end
+
+    TriggerClientEvent('l4-notify:show', -1, {
+        type = type,
+        message = message,
+        length = 5000,
+        position = position,
+        playSound = sound,
+        iconAnimation = iconAnimation
+    })
+end, false)
