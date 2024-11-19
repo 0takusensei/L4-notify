@@ -5,97 +5,61 @@ A modern FiveM notification system with different types, animations and sound ef
 
 ### Features
 - 5 different notification types (success, error, warning, info, neutral)
-- 8 different positions
 - Modern animations
-- Sound effects (optional)
-- Icon animations (optional)
+- Sound effect
 - Customizable duration
-- Works with ESX/QBCore/Standalone
+- Easy integration
 
-### Installation ##
+### Installation
 1. Copy the `l4-notify` folder to your `resources` folder
-2. Add `ensure l4-notify` to your `server.cfg`
+2. Configure your framework in `server.lua` line 1-9:
+   - For QBCore: Uncomment the QBCore export line
+   - For ESX: Uncomment the ESX export line
+   - For Standalone: Uncomment the admins list
+3. Add `ensure l4-notify` to your `server.cfg`
 
-## Client Side Usage ## 
+#### In-Game test Command
 
-## Using Export
+/notify [type] [message]
+
+## Success Notification ##
 
 exports['l4-notify']:Show({
-    type = 'success', -- success, error, warning, info, neutral
-    message = 'Example Message',
-    length = 5000, -- Duration in ms (optional, default: 5000)
-    position = 'top-left', -- Position (optional, default: top-left)
-    playSound = true, -- Play sound (optional, default: true)
-    iconAnimation = true -- Animate icon (optional, default: true)
-})
-
-## Using Event
-
--- Basic Event Usage
-TriggerEvent('l4-notify:show', {
-    type = 'error',
-    message = 'Error Message',
-    length = 3000,
-    position = 'top-right',
-    playSound = true,
-    iconAnimation = true
-})
-
-## Command Usage ##
-
-/notify [type] [message] [position] [sound] [iconAnimation]
-
-## Server Side Usage ## 
-
-## Using Export
-
--- Send to specific player
-exports['l4-notify']:ShowToPlayer(source, {
     type = 'success',
-    message = 'Server Message',
-    length = 5000,
-    position = 'top-left',
-    playSound = true,
-    iconAnimation = true
+    message = 'Action completed successfully!',
+    length = 5000 -- Optional (default: 5000ms)
 })
 
--- Send to all players
-exports['l4-notify']:ShowToAll({
+## Error Notification ##
+
+exports['l4-notify']:Show({
+    type = 'error',
+    message = 'An error has occurred!',
+    length = 5000
+})
+
+## Warning Notification ##
+
+exports['l4-notify']:Show({
+    type = 'warning',
+    message = 'Warning! Low health!',
+    length = 5000
+})
+
+## Info Notification ##
+
+exports['l4-notify']:Show({
     type = 'info',
-    message = 'Broadcast Message'
+    message = 'New mission available!',
+    length = 5000
 })
 
-## Integration Example ## 
+## Neutral Notification
 
--- ESX Example
-ESX.ShowNotification = function(message, type)
-    exports['l4-notify']:Show({
-        type = type or 'neutral',
-        message = message
-    })
-end
+exports['l4-notify']:Show({
+    type = 'neutral',
+    message = 'Server restart in 5 minutes',
+    length = 5000
+})
 
--- QBCore Example
-QBCore.Functions.Notify = function(message, type)
-    exports['l4-notify']:Show({
-        type = type or 'neutral',
-        message = message
-    })
-end
-
-## Available Positions ##
-top-left
-top-right
-bottom-left
-bottom-right
-top
-bottom
-middle-left
-middle-right
-
-## Notification Types ##
-success (green)
-error (red)
-warning (yellow)
-info (blue)
-neutral (grey)
+## ESX Example ##
